@@ -3,96 +3,192 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>День с ИИ или без? — игра Айны</title>
+<title>День с нейросетями или без них — игра Айны</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#f5f5f5;display:flex;justify-content:center;padding:20px;font-family:system-ui,sans-serif}
+html{height:100%}
+body{background:#f5f5f5;display:flex;justify-content:center;align-items:flex-start;min-height:100%;min-height:100dvh;padding:12px;font-family:"Segoe UI",system-ui,-apple-system,sans-serif;font-size:17px;line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 .gw{width:100%;max-width:640px}
+body.game-play{padding:8px;padding-top:max(8px, env(safe-area-inset-top));padding-bottom:max(8px, env(safe-area-inset-bottom));height:100dvh;max-height:100dvh;overflow:hidden;touch-action:manipulation;display:flex;flex-direction:column;align-items:center;justify-content:flex-start}
+body.game-play .gw{flex:1;min-height:0;width:100%;max-width:640px;display:flex;flex-direction:column}
+#game-screen #level-area:empty{flex:0 0 auto;margin:0;padding:0;min-height:0}
 .screen{width:100%}
-.intro-screen{background:#fff;border:0.5px solid #ddd;border-radius:14px;padding:1.5rem;text-align:center}
-.intro-title{font-size:22px;font-weight:500;color:#222;margin-bottom:8px}
-.intro-sub{font-size:15px;color:#666;margin-bottom:1.5rem;line-height:1.7}
-.hour-block{background:#f5f5f5;border-radius:14px;padding:1.25rem;margin-bottom:1.25rem;text-align:left}
-.hour-q{font-size:16px;font-weight:500;color:#222;margin-bottom:4px}
-.hour-hint-top{font-size:13px;color:#666;margin-bottom:14px;line-height:1.5}
+.intro-screen{background:#fff;border:0.5px solid #ddd;border-radius:14px;padding:1.75rem;text-align:center}
+.intro-title{font-size:22px;font-weight:750;color:#1a1a1a;margin-bottom:10px;line-height:1.28;letter-spacing:.04em;text-transform:uppercase}
+.intro-sub{font-size:17px;color:#444;margin-bottom:1.5rem;line-height:1.65}
+.prof-block{background:#f7f8fa;border-radius:14px;padding:1rem 1.1rem;margin-bottom:1rem;text-align:left;border:1px solid #eaeaea}
+.prof-q{font-size:17px;font-weight:600;color:#222;margin-bottom:6px}
+.prof-hint{font-size:14px;color:#555;margin-bottom:10px;line-height:1.45}
+.prof-select-wrap{position:relative;width:100%}
+.prof-select-wrap::after{
+  content:'';
+  position:absolute;right:16px;top:50%;
+  width:7px;height:7px;margin-top:-5px;
+  border:solid #534AB7;border-width:0 2px 2px 0;
+  transform:rotate(45deg);
+  pointer-events:none;opacity:.85;
+}
+.prof-select{
+  width:100%;font-size:16px;font-weight:600;padding:12px 42px 12px 14px;border-radius:12px;border:1px solid #ccc;background:#fff;color:#222;cursor:pointer;
+  appearance:none;-webkit-appearance:none;-moz-appearance:none;
+}
+.prof-select:focus{outline:none;border-color:#7F77DD;box-shadow:0 0 0 3px rgba(127,119,221,0.2)}
+.hour-block{background:#f5f5f5;border-radius:14px;padding:1.35rem;margin-bottom:1.25rem;text-align:left}
+.hour-q{font-size:18px;font-weight:600;color:#222;margin-bottom:6px}
+.hour-hint-top{font-size:15px;color:#555;margin-bottom:14px;line-height:1.55}
 .hour-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-.hour-input{flex:1;font-size:22px;font-weight:500;padding:12px 14px;border-radius:12px;border:0.5px solid #ccc;background:#fff;color:#222;text-align:center}
-.hour-unit{font-size:15px;color:#666;white-space:nowrap;font-weight:500}
-.month-calc{font-size:14px;color:#999;text-align:center;padding:8px;background:#fff;border-radius:10px;margin-bottom:12px}
-.month-calc span{font-weight:500;color:#222}
-.presets{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
-.preset{padding:8px 14px;border-radius:10px;font-size:14px;cursor:pointer;border:0.5px solid #ccc;background:#fff;color:#666;font-weight:500}
+.hour-input{flex:1;font-size:24px;font-weight:600;padding:14px 16px;border-radius:12px;border:0.5px solid #ccc;background:#fff;color:#222;text-align:center}
+.hour-unit{font-size:16px;color:#555;white-space:nowrap;font-weight:600}
+.month-calc{font-size:15px;color:#666;text-align:center;padding:10px 12px;background:#fff;border-radius:10px;margin-bottom:12px}
+.month-calc span{font-weight:650;color:#222}
+.presets{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.preset{padding:10px 16px;border-radius:10px;font-size:15px;cursor:pointer;border:0.5px solid #ccc;background:#fff;color:#444;font-weight:600}
 .preset:hover{background:#f0f0f0;color:#222}
 .preset.active{background:#EEEDFE;border-color:#7F77DD;color:#3C3489}
-.go-btn{display:block;width:100%;padding:15px;border-radius:14px;font-size:17px;font-weight:500;cursor:pointer;border:none;background:#534AB7;color:#fff;margin-top:4px}
-.go-btn:hover{background:#3C3489}
-.game-screen{display:none;width:100%}
-.sky-wrap{width:100%;height:130px;border-radius:14px 14px 0 0;overflow:hidden;position:relative}
-#sky-cv{display:block;width:100%;height:130px}
-.time-badge{position:absolute;right:10px;bottom:8px;font-size:11px;font-weight:500;color:rgba(255,255,255,0.9);background:rgba(0,0,0,0.3);padding:2px 10px;border-radius:6px}
-.road-wrap{background:#1a2a0a;border-radius:0 0 14px 14px;border:0.5px solid #ccc;border-top:none;padding:10px 12px 12px}
-.hud{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:10px 0}
-.hp{background:#f0f0f0;border-radius:10px;padding:7px 8px}
-.hp-l{font-size:10px;color:#888;margin-bottom:2px}
-.hp-v{font-size:14px;font-weight:500;color:#222;margin-bottom:3px}
-.hp-b{height:4px;border-radius:2px;background:#ddd;overflow:hidden}
+.go-btn{display:block;width:100%;padding:16px 18px;border-radius:14px;font-size:18px;font-weight:650;cursor:pointer;border:none;background:#534AB7;color:#fff;margin-top:4px}
+.go-btn:hover:not(:disabled){background:#3C3489}
+.go-btn:disabled{opacity:.42;cursor:not-allowed}
+.game-screen{display:none;width:100%;flex:1;min-height:0;flex-direction:column}
+.game-head{flex-shrink:0}
+#game-screen #level-area{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+#game-screen #final-box{flex-shrink:1;min-height:0;overflow-y:auto;margin-top:3px}
+body.game-play .final{padding:0.75rem 0.65rem;margin-top:0}
+body.game-play .f-title{font-size:17px;margin-bottom:3px;line-height:1.25}
+body.game-play .f-sub{font-size:12px;margin-bottom:0.65rem;line-height:1.4}
+body.game-play .sgrid{gap:6px;margin-bottom:0.65rem}
+body.game-play .scard{padding:8px;border-radius:9px}
+body.game-play .scard-l{font-size:11px}
+body.game-play .scard-v{font-size:17px}
+body.game-play .scard-n{font-size:11px;margin-top:2px}
+body.game-play .mrow--mentor{padding:0.65rem 0.55rem;margin-bottom:0.55rem}
+body.game-play .mrow--mentor .mtext{font-size:14px}
+body.game-play .mrow--mentor .mname{font-size:13px;margin-bottom:5px}
+body.game-play .cta-wrap{padding:0.75rem;margin-bottom:6px}
+body.game-play .cta-title{font-size:15px;margin-bottom:4px}
+body.game-play .cta-sub{font-size:12px;margin-bottom:8px;line-height:1.35}
+body.game-play .ctabtn{padding:10px 8px;font-size:13px}
+body.game-play .rbtn{padding:10px;font-size:14px;margin-top:6px}
+body.game-play .mava.mava--aina{min-width:54px;padding:5px 4px 4px;border-radius:16px}
+body.game-play .mava.mava--aina svg,body.game-play .mava.mava--aina img{width:50px;max-height:72px}
+.sky-wrap{width:100%;height:84px;border-radius:12px 12px 0 0;overflow:hidden;position:relative}
+#sky-cv{display:block;width:100%;height:84px}
+.time-badge{position:absolute;right:8px;bottom:5px;font-size:11px;font-weight:650;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,0.35);background:rgba(0,0,0,0.38);padding:4px 9px;border-radius:7px}
+.road-wrap{background:#1a2a0a;border-radius:0 0 12px 12px;border:0.5px solid #ccc;border-top:none;padding:5px 8px 7px}
+.road-wrap svg{max-height:46px;display:block;width:100%}
+.hud{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin:6px 0 6px}
+.hp{background:#eef0f2;border-radius:8px;padding:5px 6px}
+.hp-l{font-size:10px;font-weight:600;color:#555;margin-bottom:2px;letter-spacing:.02em;line-height:1.2}
+.hp-v{font-size:13px;font-weight:650;color:#1a1a1a;margin-bottom:2px;line-height:1.15}
+.hp-b{height:3px;border-radius:2px;background:#ddd;overflow:hidden}
 .hp-f{height:100%;border-radius:2px;transition:width .5s,background .5s}
-.scene{background:#fff;border:0.5px solid #ddd;border-radius:14px;padding:1.25rem;margin-top:6px}
-.sc-top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-.sc-icon{width:52px;height:52px;border-radius:14px;background:#f5f5f5;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;border:0.5px solid #eee}
-.sc-step{font-size:12px;color:#7F77DD;font-weight:500;margin-bottom:3px}
-.sc-title{font-size:16px;font-weight:500;color:#222;line-height:1.4}
-.mbar{display:flex;align-items:center;gap:12px;border-radius:12px;padding:10px 14px;margin-bottom:14px;border:0.5px solid}
-.mface{font-size:32px;animation:ms .5s infinite alternate;flex-shrink:0}
-@keyframes ms{0%{transform:translateX(-3px) rotate(-5deg)}100%{transform:translateX(3px) rotate(5deg)}}
-.mn{font-size:14px;font-weight:500;margin-bottom:2px}
-.md{font-size:12px;opacity:.8;margin-bottom:6px}
-.mtags{display:flex;gap:6px;flex-wrap:wrap}
-.mtag{font-size:12px;padding:3px 10px;border-radius:6px;font-weight:500}
-.choices{display:flex;gap:10px;flex-wrap:wrap}
-.cbtn{flex:1;min-width:150px;padding:13px 16px;border-radius:12px;font-size:15px;font-weight:500;cursor:pointer;border:0.5px solid #ccc;background:#f5f5f5;color:#222;line-height:1.4;text-align:center}
-.cbtn:hover:not(:disabled){background:#e8e8e8}
-.cbtn.ai{border-color:#1D9E75;color:#085041;background:#E1F5EE}
+.scene{background:#fff;border:0.5px solid #ddd;border-radius:11px;padding:0.65rem;margin-top:3px}
+.task-focus{background:linear-gradient(165deg,#f4f2ff 0%,#faf8ff 45%,#fff 100%);border:2px solid #7F77DD;border-radius:11px;padding:0.55rem 0.65rem 0.65rem;margin-bottom:8px;box-shadow:0 2px 10px rgba(83,74,183,0.1)}
+.task-focus .sc-top{align-items:flex-start;margin-bottom:0}
+.sc-top{display:flex;align-items:flex-start;gap:8px}
+.sc-icon{width:42px;height:42px;border-radius:11px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;border:2px solid #d8d2f5;box-shadow:0 2px 6px rgba(83,74,183,0.06)}
+.task-pill{display:inline-block;font-size:11px;font-weight:700;color:#fff;background:linear-gradient(135deg,#534AB7,#7F77DD);padding:3px 9px;border-radius:999px;margin-bottom:4px;letter-spacing:.02em}
+.sc-meta{flex:1;min-width:0}
+.sc-step{font-size:12px;color:#534AB7;font-weight:700;margin-bottom:3px;line-height:1.25}
+.sc-title{font-size:15px;font-weight:700;color:#141414;line-height:1.28;letter-spacing:-0.02em}
+.sc-who{font-size:11px;color:#555;margin-top:4px;line-height:1.35;padding-top:5px;border-top:1px solid rgba(127,119,221,0.22)}
+.mbar-hint{font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;line-height:1.2}
+.mbar{display:flex;align-items:flex-start;gap:8px;border-radius:10px;padding:7px 9px;margin-bottom:8px;border:1px solid #e2e2e2;background:#f7f7f8}
+.mbar--risk{border-color:#dcd6ee;background:#faf9fc}
+.mface{font-size:20px;animation:ms .55s infinite alternate;flex-shrink:0;line-height:1;opacity:.92}
+@keyframes ms{0%{transform:translateX(-2px) rotate(-4deg)}100%{transform:translateX(2px) rotate(4deg)}}
+.mn{font-size:13px;font-weight:650;margin-bottom:2px;color:#5a4a6a;line-height:1.25}
+.md{font-size:11px;line-height:1.35;color:#666;margin-bottom:5px}
+.mtags{display:flex;gap:5px;flex-wrap:wrap}
+.mtag{font-size:11px;padding:3px 8px;border-radius:6px;font-weight:650;border:1px solid rgba(0,0,0,0.06)}
+.choices{display:flex;gap:7px;flex-wrap:wrap}
+.cbtn{flex:1;min-width:0;padding:10px 12px;border-radius:10px;font-size:14px;font-weight:650;cursor:pointer;border:1px solid #c8c8c8;background:#f0f0f0;color:#1a1a1a;line-height:1.25;text-align:center}
+.cbtn:hover:not(:disabled){background:#e4e4e4}
+.cbtn.ai{border-color:#1D9E75;color:#054a36;background:#daf5ea}
 .cbtn.ai:hover:not(:disabled){background:#9FE1CB}
-.cbtn:disabled{opacity:.4;cursor:default}
-.result{font-size:15px;padding:14px 16px;border-radius:12px;margin-top:12px;line-height:1.7;display:none;border:0.5px solid}
-.result.bad{background:#FCEBEB;color:#7A1F1F;border-color:rgba(226,75,74,0.3)}
-.result.good{background:#E1F5EE;color:#085041;border-color:rgba(29,158,117,0.3)}
-.next-btn{display:none;width:100%;padding:12px;border-radius:10px;font-size:15px;font-weight:500;cursor:pointer;border:0.5px solid #ccc;background:#f5f5f5;color:#222;margin-top:10px;text-align:center}
-.next-btn:hover{background:#e8e8e8}
-.final{display:none;background:#fff;border:0.5px solid #ddd;border-radius:14px;padding:1.5rem;margin-top:10px}
-.f-title{font-size:20px;font-weight:500;color:#222;margin-bottom:4px}
-.f-sub{font-size:14px;color:#666;margin-bottom:1.25rem;line-height:1.6}
-.sgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:1.25rem}
-.scard{background:#f5f5f5;border-radius:12px;padding:12px}
-.scard-l{font-size:12px;color:#666;margin-bottom:2px}
-.scard-v{font-size:22px;font-weight:500}
+.cbtn:disabled{opacity:.45;cursor:default}
+.result{font-size:13px;padding:8px 10px;border-radius:9px;margin-top:7px;line-height:1.45;display:none;border:1px solid;font-weight:500;max-height:min(120px,22vh);overflow-y:auto;-webkit-overflow-scrolling:touch}
+.result.bad{background:#FCEBEB;color:#5c1515;border-color:rgba(226,75,74,0.35)}
+.result.good{background:#E1F5EE;color:#0a4d38;border-color:rgba(29,158,117,0.35)}
+.next-btn{display:none;width:100%;padding:9px 12px;border-radius:9px;font-size:14px;font-weight:650;cursor:pointer;border:1px solid #ccc;background:#eef0f2;color:#222;margin-top:7px;text-align:center}
+.next-btn:hover{background:#e4e6e8}
+.final{display:none;background:#fff;border:0.5px solid #ddd;border-radius:14px;padding:1.65rem;margin-top:10px}
+.f-title{font-size:24px;font-weight:700;color:#1a1a1a;margin-bottom:6px;line-height:1.3}
+.f-sub{font-size:16px;color:#444;margin-bottom:1.35rem;line-height:1.6}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:1.35rem}
+.scard{background:#f5f5f5;border-radius:12px;padding:13px}
+.scard-l{font-size:13px;font-weight:600;color:#555;margin-bottom:3px}
+.scard-v{font-size:23px;font-weight:700}
 .scard-v.red{color:#c0392b}
 .scard-v.grn{color:#1D9E75}
-.scard-n{font-size:12px;color:#999;margin-top:2px}
-.mrow{display:flex;gap:10px;align-items:flex-start;background:#f5f5f5;border-radius:12px;padding:1rem;margin-bottom:1.25rem}
-.mava{width:38px;height:38px;border-radius:50%;background:#534AB7;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;color:#fff}
-.mname{font-size:11px;font-weight:500;color:#7F77DD;margin-bottom:3px}
-.mtext{font-size:14px;color:#222;line-height:1.6}
-.cta-wrap{background:#EEEDFE;border:2px solid #7F77DD;border-radius:14px;padding:1.25rem;margin-bottom:10px}
-.cta-title{font-size:17px;font-weight:500;color:#26215C;text-align:center;margin-bottom:6px}
-.cta-sub{font-size:13px;color:#534AB7;text-align:center;margin-bottom:12px}
+.scard-n{font-size:13px;color:#777;margin-top:3px}
+.mrow{display:flex;gap:12px;align-items:flex-start;background:#f5f5f5;border-radius:12px;padding:1.1rem;margin-bottom:1.25rem}
+.mava{width:40px;height:40px;border-radius:50%;background:#534AB7;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;color:#fff}
+.mrow--mentor{background:#fff;border:2px solid #e6e3f6;border-radius:14px;padding:1.25rem 1.15rem;margin-bottom:1.25rem;box-shadow:0 4px 18px rgba(83,74,183,0.07);align-items:flex-start}
+.mrow-mentor__body{flex:1;min-width:0}
+.mrow--mentor .mname{font-size:16px;font-weight:800;color:#534AB7;margin-bottom:10px;letter-spacing:.02em}
+.mrow--mentor .mtext{font-size:18px;font-weight:600;line-height:1.55;color:#141414}
+.mava.mava--aina{
+  width:auto;height:auto;min-width:60px;border-radius:20px;
+  background:linear-gradient(145deg,#ffffff 0%,#f4f6fc 48%,#e8ecf8 100%);
+  border:2px solid rgba(127,119,221,0.35);
+  box-shadow:0 4px 22px rgba(83,74,183,0.14),0 0 0 1px rgba(255,255,255,0.9) inset,0 2px 8px rgba(60,52,120,0.06);
+  padding:7px 6px 5px;display:flex;align-items:flex-end;justify-content:center;color:transparent;font-size:0;
+  position:relative;overflow:hidden;
+}
+.mava.mava--aina::before{
+  content:'';
+  position:absolute;inset:-40% -20% auto -20%;height:55%;
+  background:radial-gradient(ellipse at 50% 0%,rgba(255,255,255,0.95) 0%,rgba(255,255,255,0) 72%);
+  pointer-events:none;
+}
+.mava.mava--aina svg,.mava.mava--aina img{
+  position:relative;display:block;width:58px;height:auto;max-height:84px;
+  object-fit:contain;object-position:bottom center;
+  filter:drop-shadow(0 2px 6px rgba(60,52,120,0.12));
+}
+.mname{font-size:12px;font-weight:700;color:#7F77DD;margin-bottom:4px}
+.mtext{font-size:15px;color:#222;line-height:1.6}
+.cta-wrap{background:#EEEDFE;border:2px solid #7F77DD;border-radius:14px;padding:1.35rem;margin-bottom:10px}
+.cta-title{font-size:19px;font-weight:700;color:#26215C;text-align:center;margin-bottom:8px;line-height:1.3}
+.cta-sub{font-size:15px;color:#534AB7;text-align:center;margin-bottom:14px;line-height:1.55}
 .cta-btns{display:flex;gap:8px;flex-wrap:wrap}
-.ctabtn{flex:1;min-width:110px;padding:14px 10px;border-radius:12px;font-size:15px;font-weight:500;cursor:pointer;text-align:center;border:none;color:#fff}
+.ctabtn{flex:1;min-width:110px;padding:15px 12px;border-radius:12px;font-size:16px;font-weight:650;cursor:pointer;text-align:center;border:none;color:#fff}
 .ctabtn.tg{background:#2AABEE}.ctabtn.tg:hover{background:#1a9bde}
 .ctabtn.wa{background:#25D366}.ctabtn.wa:hover{background:#15c356}
 .ctabtn.mx{background:#7F77DD}.ctabtn.mx:hover{background:#534AB7}
-.rbtn{display:block;width:100%;padding:12px;border-radius:12px;font-size:15px;font-weight:500;cursor:pointer;text-align:center;border:0.5px solid #ccc;background:#f5f5f5;color:#222;margin-top:8px}
-.rbtn:hover{background:#e8e8e8}
+.rbtn{display:block;width:100%;padding:14px 16px;border-radius:12px;font-size:16px;font-weight:650;cursor:pointer;text-align:center;border:1px solid #ccc;background:#f0f0f0;color:#222;margin-top:8px}
+.rbtn:hover{background:#e4e4e4}
+.sfx-toggle{position:fixed;top:12px;right:12px;z-index:200;width:46px;height:46px;border-radius:14px;border:1px solid #ddd;background:#fff;cursor:pointer;font-size:20px;line-height:1;box-shadow:0 2px 12px rgba(0,0,0,.1);transition:background .15s,transform .1s}
+.sfx-toggle:hover{background:#f5f5f5}
+.sfx-toggle:active{transform:scale(.96)}
+@media(max-width:420px){.intro-title{font-size:17px;letter-spacing:.035em;line-height:1.22}}
+@media(max-width:480px){.sfx-toggle{top:8px;right:8px;width:42px;height:42px;font-size:18px}}
 </style>
 </head>
 <body>
+<button type="button" class="sfx-toggle" id="sfx-toggle" title="Звук в игре" aria-label="Включить или выключить звук" aria-pressed="false">🔊</button>
 <div class="gw">
 
 <!-- ЭКРАН 1: ВЫБОР СТОИМОСТИ ЧАСА -->
 <div class="screen intro-screen" id="intro-screen">
-  <div class="intro-title">День с ИИ или без?</div>
-  <div class="intro-sub">8 задач. За каждой — монстр-пожиратель.<br>Пройди день и узнай сколько теряешь без нейросетей — в <b>твоих</b> деньгах.</div>
+  <div class="intro-title">День с нейросетями или без них</div>
+  <div class="intro-sub">8 задач. За каждой — монстр-пожиратель.<br>Пройди день и узнай, сколько ты теряешь без нейросетей — в <b>деньгах, времени, энергии</b>…</div>
+  <div class="prof-block">
+    <div class="prof-q">Кто ты по роду деятельности?</div>
+    <div class="prof-hint">От выбора зависят все восемь задач дня — сценарии и формулировки.</div>
+    <div class="prof-select-wrap">
+    <select class="prof-select" id="activity-group" aria-label="Род деятельности">
+      <option value="">— Выбери свою сферу —</option>
+      <option value="group_helping">Помогающие профессии (коучи, психологи, врачи, стилисты)</option>
+      <option value="group_law">Цифры и право (бухгалтеры, юристы, риелторы)</option>
+      <option value="group_digital">Цифровые профессии (маркетологи, дизайнеры, IT)</option>
+      <option value="group_service">Сервис и люди (салоны, кафе, фитнес, клиники)</option>
+      <option value="group_goods">Товар и производство (торговля, handmade, строительство)</option>
+      <option value="group_projects">Проекты и знания (онлайн-школы, агентства, ВЭД)</option>
+      <option value="group_home">Домохозяйки (мамы, дом, семья)</option>
+    </select>
+    </div>
+  </div>
   <div class="hour-block">
     <div class="hour-q">Сколько стоит твой рабочий час?</div>
     <div class="hour-hint-top">Введи сумму или выбери из готовых вариантов. Все потери и экономия будут считаться именно от твоей цифры.</div>
@@ -109,14 +205,14 @@ body{background:#f5f5f5;display:flex;justify-content:center;padding:20px;font-fa
       <button class="preset" onclick="setRate(5000)">5 000 ₽</button>
     </div>
   </div>
-  <button class="go-btn" onclick="startGame()">▶ Начать приключение</button>
+  <button type="button" class="go-btn" id="go-btn" onclick="startGame()" disabled>▶ Начать приключение</button>
 </div>
 
 <!-- ЭКРАН 2: ИГРА -->
 <div class="screen game-screen" id="game-screen">
-  <div style="border-radius:14px;border:0.5px solid #ccc;overflow:hidden">
+  <div class="game-head" style="border-radius:12px;border:0.5px solid #ccc;overflow:hidden">
     <div class="sky-wrap">
-      <canvas id="sky-cv" width="640" height="130"></canvas>
+      <canvas id="sky-cv" width="640" height="84"></canvas>
       <div class="time-badge" id="time-badge">Утро · 7:00</div>
     </div>
     <div class="road-wrap">
@@ -141,64 +237,313 @@ body{background:#f5f5f5;display:flex;justify-content:center;padding:20px;font-fa
 
 </div>
 <script>
-const LVL=[
-  {
-    icon:"✏️",label:"Пост",task:"Написать продающий пост или email-рассылку",who:"Эксперты, фрилансеры, ИП",
-    mt:"time",mn:"Пожиратель времени",mf:"👾",md:"Охотится на тех, кто пишет с нуля вручную",
-    tc:1.5,mult:1.5,st:18,en:20,
-    bad:"Долго смотришь в пустой экран. Мысли не идут, время уходит. Монстр доволен.",
-    good:"Нейросети написали черновик за пару минут, ты доработал под себя. Монстр убежал!"
-  },
-  {
-    icon:"🤝",label:"Клиенты",task:"Общение с клиентами: ответы, возражения, переписка",who:"Все виды бизнеса и фриланса",
-    mt:"energy",mn:"Пожиратель сил",mf:"😈",md:"Высасывает энергию через повторяющиеся вопросы",
-    tc:2,mult:2,st:28,en:30,
-    bad:"Отвечаешь на одни и те же вопросы по несколько раз в день. Силы уходят, а очередь не кончается.",
-    good:"Нейросети помогли написать готовые ответы на частые вопросы. Ты тратишь время только на то, что действительно важно!"
-  },
-  {
-    icon:"📨",label:"Почта",task:"Разобрать входящие письма и ответить на запросы",who:"Фрилансеры, ИП, менеджеры",
-    mt:"energy",mn:"Пожиратель энергии",mf:"🦠",md:"Размножается с каждым непрочитанным письмом",
-    tc:1.5,mult:1.5,st:22,en:25,
-    bad:"Долго переписываешься, обрабатываешь письма. Мозг устаёт, а новые письма всё приходят.",
-    good:"Нейросети написали черновики ответов за минуты. Ты проверил и отправил — быстро и без усилий!"
-  },
-  {
-    icon:"📐",label:"Презентация",task:"Сделать презентацию для клиента или инвестора",who:"Предприниматели, эксперты, продажи",
-    mt:"time",mn:"Великий пожиратель",mf:"👹",md:"Гигант — крадёт полдня за один слайд",
-    tc:3,mult:3,st:30,en:35,
-    bad:"Несколько часов в PowerPoint. Переставляешь блоки, не можешь собрать мысли. Полдня нет.",
-    good:"Нейросети сделали структуру и оформление за считанные минуты. Тебя спросили — кто делал?"
-  },
-  {
-    icon:"🎬",label:"Контент",task:"Придумать и запланировать контент на неделю",who:"Блогеры, маркетологи, SMM",
-    mt:"stress",mn:"Пожиратель идей",mf:"🧟",md:"Убивает вдохновение и вгоняет в творческий ступор",
-    tc:2,mult:2,st:35,en:28,
-    bad:"Сидишь над пустым планером. Идей мало, все кажутся неинтересными. Выгорание подкрадывается.",
-    good:"Нейросети выдали десятки идей за минуты. Ты выбрал лучшие — контент-план на неделю готов!"
-  },
-  {
-    icon:"📋",label:"Договор",task:"Составить договор или коммерческое предложение",who:"ИП, фрилансеры, предприниматели",
-    mt:"money",mn:"Пожиратель прибыли",mf:"💀",md:"Прячется в шаблонах и съедает часы на правки",
-    tc:2.5,mult:2.5,st:25,en:22,
-    bad:"Искал шаблон договора или писал сам — мысли не складываются, формулировки не те. Время ушло.",
-    good:"Нейросети написали структуру за минуты. Ты добавил детали — профессионально и уверенно!"
-  },
-  {
-    icon:"📣",label:"Реклама",task:"Написать рекламные тексты и объявления",who:"Маркетологи, ИП, малый бизнес",
-    mt:"time",mn:"Пожиратель бюджета",mf:"🤡",md:"Сжигает деньги на неэффективные тексты",
-    tc:2,mult:2,st:25,en:25,
-    bad:"Долго писал объявления. Запустил — конверсия низкая. Деньги на рекламу потрачены зря.",
-    good:"Нейросети написали несколько вариантов текстов за минуты. Тестируй лучшие — результат растёт!"
-  },
-  {
-    icon:"📊",label:"Отчёт",task:"Подготовить финансовый или аналитический отчёт",who:"Бухгалтеры, аналитики, ИП, бизнес",
-    mt:"time",mn:"Пожиратель дня",mf:"🐲",md:"Самый страшный — прячется в таблицах и формулах",
-    tc:3,mult:3,st:40,en:35,
-    bad:"Несколько часов в таблицах. Цифры плывут, ошибки находишь поздно вечером. Весь день убит.",
-    good:"Нейросети проанализировали данные за несколько минут. Ты проверил выводы — и всё готово!"
-  },
+var SFX=(function(){
+  var ctx,master,mute=false;
+  function audio(){
+    if(!ctx){
+      ctx=new (window.AudioContext||window.webkitAudioContext)();
+      master=ctx.createGain();
+      master.gain.value=0.34;
+      master.connect(ctx.destination);
+    }
+    return ctx;
+  }
+  function resume(){try{var c=audio();if(c.state==='suspended')c.resume();}catch(e){}}
+  function save(){try{localStorage.setItem('aina_sfx_muted',mute?'1':'');}catch(e){}}
+  function load(){try{return localStorage.getItem('aina_sfx_muted')==='1';}catch(e){return false}}
+  function now(){return audio().currentTime;}
+  function fire(freq,t0,dur,wave,vol){
+    if(mute)return;
+    var c=audio(),o=c.createOscillator(),g=c.createGain();
+    o.type=wave||'sine';
+    o.frequency.setValueAtTime(freq,t0);
+    g.gain.setValueAtTime(0,t0);
+    g.gain.linearRampToValueAtTime(vol,t0+0.018);
+    g.gain.linearRampToValueAtTime(0,t0+dur);
+    o.connect(g);g.connect(master);
+    o.start(t0);o.stop(t0+dur+0.03);
+  }
+  function sweep(freq0,freq1,t0,dur,wave,vol){
+    if(mute)return;
+    var c=audio(),o=c.createOscillator(),g=c.createGain();
+    o.type=wave||'triangle';
+    o.frequency.setValueAtTime(freq0,t0);
+    o.frequency.linearRampToValueAtTime(freq1,t0+dur);
+    g.gain.setValueAtTime(0,t0);
+    g.gain.linearRampToValueAtTime(vol,t0+0.02);
+    g.gain.linearRampToValueAtTime(0,t0+dur);
+    o.connect(g);g.connect(master);
+    o.start(t0);o.stop(t0+dur+0.03);
+  }
+  return{
+    init:function(){mute=load();},
+    resume:resume,
+    unmute:function(){mute=false;save();},
+    isMuted:function(){return mute;},
+    toggle:function(){mute=!mute;save();return mute;},
+    ui:function(){resume();fire(920,now(),0.06,'sine',0.11);},
+    preset:function(){resume();fire(740,now(),0.05,'triangle',0.075);},
+    gameStart:function(){
+      resume();var t=now(),n=0;
+      [523.25,659.25,783.99,1046.5].forEach(function(f){
+        fire(f,t+n*0.085,0.16,'square',0.055);n++;
+      });
+    },
+    footstep:function(){
+      if(mute)return;resume();
+      sweep(130,65,now(),0.07,'triangle',0.055);
+    },
+    taskShow:function(){
+      resume();var t=now();
+      fire(880,t,0.11,'sine',0.085);fire(1108,t+0.07,0.13,'sine',0.07);
+    },
+    success:function(){
+      resume();var t=now(),i=0;
+      [784,988,1175,1568].forEach(function(f){fire(f,t+i*0.068,0.13,'sine',0.065);i++;});
+    },
+    fail:function(){
+      resume();var t=now();
+      sweep(220,95,t,0.28,'sawtooth',0.075);fire(110,t+0.22,0.35,'triangle',0.055);
+    },
+    next:function(){
+      resume();var t=now();fire(587,t,0.09,'sine',0.085);fire(784,t+0.07,0.11,'sine',0.065);
+    },
+    victory:function(level){
+      resume();var t=now();
+      if(level===2){
+        var j=0;[523,659,784,988,1175].forEach(function(f){fire(f,t+j*0.095,0.22,'square',0.048);j++;});
+      }else if(level===1){
+        var k=0;[523,659,784].forEach(function(f){fire(f,t+k*0.125,0.26,'sine',0.075);k++;});
+      }else{
+        var n=0;[233,208,185,174].forEach(function(f){fire(f,t+n*0.16,0.38,'triangle',0.065);n++;});
+      }
+    }
+  };
+})();
+function packRow(icon,label,task,who,bad,good){return {icon:icon,label:label,task:task,who:who,bad:bad,good:good};}
+var LEVEL_STATS=[
+  {tc:1.5,mult:1.5,st:18,en:20,mt:"time"},
+  {tc:2,mult:2,st:28,en:30,mt:"energy"},
+  {tc:1.5,mult:1.5,st:22,en:25,mt:"energy"},
+  {tc:3,mult:3,st:30,en:35,mt:"time"},
+  {tc:2,mult:2,st:35,en:28,mt:"stress"},
+  {tc:2.5,mult:2.5,st:25,en:22,mt:"money"},
+  {tc:2,mult:2,st:25,en:25,mt:"time"},
+  {tc:3,mult:3,st:40,en:35,mt:"time"}
 ];
+var SLOT_FACE=[
+  {mn:"Пожиратель времени",mf:"👾",md:"Охотится на тех, кто пишет с нуля вручную"},
+  {mn:"Пожиратель сил",mf:"😈",md:"Высасывает энергию через повторяющиеся вопросы"},
+  {mn:"Пожиратель энергии",mf:"🦠",md:"Размножается с каждым непрочитанным письмом"},
+  {mn:"Великий пожиратель",mf:"👹",md:"Гигант — крадёт полдня за один слайд"},
+  {mn:"Пожиратель идей",mf:"🧟",md:"Убивает вдохновение и вгоняет в творческий ступор"},
+  {mn:"Пожиратель прибыли",mf:"💀",md:"Прячется в шаблонах и съедает часы на правки"},
+  {mn:"Пожиратель бюджета",mf:"🤡",md:"Сжигает деньги на неэффективные тексты"},
+  {mn:"Пожиратель дня",mf:"🐲",md:"Самый страшный — прячется в таблицах и формулах"}
+];
+function mergeLevels(rows){
+  return rows.map(function(r,i){return Object.assign({},LEVEL_STATS[i],SLOT_FACE[i],r);});
+}
+var THEMES={
+  general:[
+    packRow("✏️","Пост","Написать продающий пост или email-рассылку","Эксперты, фрилансеры, ИП","Долго смотришь в пустой экран. Мысли не идут, время уходит. Монстр доволен.","Нейросети написали черновик за пару минут, ты доработал под себя. Монстр убежал!"),
+    packRow("🤝","Клиенты","Общение с клиентами: ответы, возражения, переписка","Все виды бизнеса и фриланса","Отвечаешь на одни и те же вопросы по несколько раз в день. Силы уходят, а очередь не кончается.","Нейросети помогли написать готовые ответы на частые вопросы. Ты тратишь время только на то, что действительно важно!"),
+    packRow("📨","Почта","Разобрать входящие письма и ответить на запросы","Фрилансеры, ИП, менеджеры","Долго переписываешься, обрабатываешь письма. Мозг устаёт, а новые письма всё приходят.","Нейросети написали черновики ответов за минуты. Ты проверил и отправил — быстро и без усилий!"),
+    packRow("📐","Презентация","Сделать презентацию для клиента или инвестора","Предприниматели, эксперты, продажи","Несколько часов в PowerPoint. Переставляешь блоки, не можешь собрать мысли. Полдня нет.","Нейросети сделали структуру и оформление за считанные минуты. Тебя спросили — кто делал?"),
+    packRow("🎬","Контент","Придумать и запланировать контент на неделю","Блогеры, маркетологи, SMM","Сидишь над пустым планером. Идей мало, все кажутся неинтересными. Выгорание подкрадывается.","Нейросети выдали десятки идей за минуты. Ты выбрал лучшие — контент-план на неделю готов!"),
+    packRow("📋","Договор","Составить договор или коммерческое предложение","ИП, фрилансеры, предприниматели","Искал шаблон договора или писал сам — мысли не складываются, формулировки не те. Время ушло.","Нейросети написали структуру за минуты. Ты добавил детали — профессионально и уверенно!"),
+    packRow("📣","Реклама","Написать рекламные тексты и объявления","Маркетологи, ИП, малый бизнес","Долго писал объявления. Запустил — конверсия низкая. Деньги на рекламу потрачены зря.","Нейросети написали несколько вариантов текстов за минуты. Тестируй лучшие — результат растёт!"),
+    packRow("📊","Отчёт","Подготовить финансовый или аналитический отчёт","Бухгалтеры, аналитики, ИП, бизнес","Несколько часов в таблицах. Цифры плывут, ошибки находишь поздно вечером. Весь день убит.","Нейросети проанализировали данные за несколько минут. Ты проверил выводы — и всё готово!")
+  ],
+  marketing:[
+    packRow("✏️","Пост","Написать пост, карусель или тред под продвижение продукта или услуги","SMM, таргетологи, маркетологи","Часами ползает черновик в документе — дедлайн горит, текст не складывается.","ИИ дал структуру и черновик — ты подставил tone of voice и опубликовал."),
+    packRow("🤝","Лиды","Разобрать заявки и переписку из рекламы, соцсетей и лид-форм","Performance, аккаунт-менеджеры","Отвечаешь каждому «с чистого листа» — очередь растёт, день закончился.","Черновики ответов из ИИ — правишь пару строк и отправляешь за минуту."),
+    packRow("📨","Рассылки","Собрать цепочку писем или сообщений в боте под сегмент аудитории","CRM-маркетологи","Долго собираешь триггеры и тексты — запуск откладывается на неделю.","ИИ собрал последовательность и черновики — ты проверил логику и включил автоматизацию."),
+    packRow("📐","Бриф","Подготовить презентацию кампании, медиаплан или отчёт для клиента или руководства","Агентства, digital-маркетинг","Слайды разъезжаются, мысль не держится — презентация «переносится на завтра».","ИИ помог со структурой и формулировками — финальный штрих и оформление за тобой."),
+    packRow("🎬","Контент-план","Запланировать рубрики, темы и контент на неделю для соцсетей и блога","Контент-маркетологи","Таблица пустая — переносишь на вечер и снова смотришь в потолок.","Десятки тем за минуты — ты выбрал лучшие и расставил по календарю."),
+    packRow("📋","Тексты","Подготовить оферту на лендинге, условия акции или юридически аккуратный текст","Growth, продакт-маркетологи","Формулировки не липнут — правишь десятый раз, время ушло.","ИИ набросал структуру и черновик — ты сверился с правилами и опубликовал."),
+    packRow("📣","Креативы","Написать заголовки и тексты объявлений под гипотезы и A/B тесты","Таргет, перформанс","Запуск рекламы задерживается — не можешь выбрать формулировки для теста.","Набор вариантов заголовков за минуты — запускаешь эксперимент и смотришь метрики."),
+    packRow("📊","Аналитика","Собрать отчёт по кампаниям: метрики, выводы и рекомендации для клиента","Digital-стратеги","Тянешь данные из кабинетов вручную — таблица раздулась, день потерян.","ИИ свёл цифры и набросал выводы — ты добавил интерпретацию под аудиторию клиента.")
+  ],
+  dev:[
+    packRow("✏️","Док","Написать README, техническую заметку или статью для блога компании","Разработчики, техписатели","Документация горит — сидишь над пустым файлом, релиз ждёт.","ИИ собрал каркас и примеры — ты поправил под стандарты команды и залил."),
+    packRow("🤝","Ревью","Разобрать комментарии код-ревью и ответить тимлиду или смежной команде","Backend, frontend, QA","Долго формулируешь каждый ответ — задачи стоят, спринт давит.","Черновики объяснений из ИИ — отправил правки и пошёл дальше по задачам."),
+    packRow("📨","Тикеты","Разгрести очередь в таск-трекере и письма по инцидентам","ИТ-поддержка, DevOps","Переписка разрастается — контекст теряется, время тает.","ИИ помог с шаблонами ответов и резюме тикета — ты закрыл пачку быстрее."),
+    packRow("📐","Демо","Подготовить слайды к демо спринта или защите архитектуры перед заказчиком","Разработка, системный анализ","Слайды собираешь до ночи — структура разваливается.","ИИ набросал структуру и формулировки — ты добавил схемы и кейсы."),
+    packRow("🎬","План","Запланировать задачи спринта: декомпозиция и описание для команды","Скрам-мастера, техлиды","Планирование затягивается — формулировки задач корявые.","ИИ помог разложить эпики на задачи и описания — ты откорректировал приоритеты."),
+    packRow("📋","ТЗ","Подготовить или поправить ТЗ, NDA и технические приложения к договору","Подряд, аутсорс","Юридические формулировки «не лезут» — правки тянутся часами.","ИИ выдал черновик разделов — ты сверился с юристом и согласовал."),
+    packRow("📣","Вакансия","Написать текст вакансии и скрининговые вопросы для HR и каналов","HR IT, техлиды","Подбор тормозит — описание вакансии не цепляет.","ИИ предложил структуру и формулировки — ты добавил специфику стека и опубликовал."),
+    packRow("📊","Метрики","Собрать отчёт по релизу: баги, скорость, метрики стабильности","Team lead, QA lead","Сводишь данные из нескольких систем — день ушёл на таблицы.","ИИ помог собрать сводку и графики — ты интерпретировал для команды.")
+  ],
+  design:[
+    packRow("✏️","Кейс","Написать описание кейса, пост к проекту или текст для портфолио","Дизайнеры, арт-директора","Текст не ложится на работу — переписываешь бесконечно.","ИИ предложил структуру кейса и черновик — ты добавил детали и эмоцию бренда."),
+    packRow("🤝","Правки","Согласовать правки с заказчиком: пояснения и ответы в переписке","Фриланс-дизайн, студии","Каждый раунд правок — длинные объяснения с нуля.","Шаблоны ответов и формулировки из ИИ — клиент быстрее понял задумку."),
+    packRow("📨","Бриф","Разобрать бриф из писем и чатов, задать уточняющие вопросы","Продуктовый дизайн, иллюстраторы","Бриф размазан по переписке — собираешь смысл часами.","ИИ помог выжать структуру брифа из переписки — ты дополнил вопросами."),
+    packRow("📐","Питч","Подготовить презентацию концепции или мудборд для защиты идей","Креативные директора","Идея есть, а слайды не складываются в историю.","ИИ набросал сторителлинг по слайдам — ты подставил визуал."),
+    packRow("🎬","План","Запланировать визуальный контент и форматы на неделю","SMM-дизайн, motion","Планер пустой — боишься повториться и откладываешь.","Пачка идей и форматов от ИИ — ты выбрал и разложил по дням."),
+    packRow("📋","Договор","Договор на передачу прав, лицензии стоков или приложение к СЗ","Иллюстраторы, бренд-дизайнеры","Юридический текст не идёт — боишься ошибиться в формулировках.","ИИ выдал черновик разделов — ты проверил с юристом."),
+    packRow("📣","Креативы","Тексты на баннеры, лендинги и рекламные носители вместе с макетом","Дизайнеры рекламы","Копирайт под макет тормозит сдачу макета.","Варианты заголовков и подзаголовков за минуты — сверстал и отдал."),
+    packRow("📊","Отчёт","Сводка по проектам: статусы, часы, что сдать на этой неделе","Студии, проджекты дизайна","Таблица разрослась — собираешь статус вручную к концу дня.","ИИ помог структурировать статусы — ты дополнил комментариями для клиента.")
+  ],
+  sales:[
+    packRow("✏️","Пост","Пост или касание в воронке: прогрев, кейс, отработка возражения в тексте","B2B-продажи, аккаунты","Каждый текст с нуля — воронка стоит, лиды остывают.","ИИ дал черновики касаний — ты персонализировал под контакт."),
+    packRow("🤝","Клиенты","Звонки, переписка, КП: ответы и возражения в реальном времени","Менеджеры по продажам","Одни и те же возражения обрабатываешь длинными монологами — время уходит.","Скрипты и короткие ответы из ИИ — говоришь структурно и быстрее."),
+    packRow("📨","КП","Подготовить коммерческое предложение и follow-up письма после встречи","Продажи услуг, агентства","КП раздувается — не закончить к дедлайну клиента.","ИИ собрал структуру КП и письма — ты вставил цифры и условия."),
+    packRow("📐","Питч","Презентация продукта или услуги для созвона с ЛПР","Account executives","Слайды переписываешь под каждого клиента до ночи.","Черновик структуры и формулировок — адаптировал под отрасль за полчаса."),
+    packRow("🎬","Сценарий","План касаний и сценарии сообщений по этапам воронки","Руководители отделов продаж","Воронка на бумаге есть, тексты «придумаем потом».","ИИ набросал цепочку сообщений по этапам — ты подстроил под процесс."),
+    packRow("📋","Договор","Договор, спецификация и приложения под сделку","Коммерческие директора","Формулировки юридические топорные — правки затягивают сделку.","Черновик разделов от ИИ — юрист поправил быстро."),
+    packRow("📣","Лидоген","Тексты лид-форм, лендингов и объявлений под поток заявок","Маркетинг+продажи","Запуск кампании задерживается из-за текстов.","Несколько вариантов заголовков и офферов — запускаешь тест."),
+    packRow("📊","Воронка","Отчёт по воронке: конверсии, причины отвалов, план действий","Sales ops, РОП","Сводишь CRM вручную — к вечеру только таблица.","ИИ помог оформить выводы по этапам — ты добавил решения для команды.")
+  ],
+  education:[
+    packRow("✏️","Анонс","Пост или рассылка: анонс урока, вебинара или запуска потока","Преподаватели, методисты","Текст анонса не цепляет — переписываешь до дедлайна.","ИИ предложил углы и черновик — ты добавил свой голос и факты."),
+    packRow("🤝","Ученики","Ответы в чате курса, разбор вопросов и обратная связь","Онлайн-школы, наставники","Одинаковые вопросы — отвечаешь длинно каждый раз.","Шаблоны и развёрнутые черновики от ИИ — дополнил личным примером."),
+    packRow("📨","Письма","Сервисные письма курса: напоминания, домашки, обратная связь","Координаторы обучения","Цепочка писем разрастается — времени на контент мало.","ИИ помог с последовательностью и текстами — ты вычитал тон."),
+    packRow("📐","Урок","Слайды и структура урока или модуля для записи или эфира","Эксперты, коучи","Презентация расползается — не укладываешься в тайминг.","ИИ собрал логику блоков и формулировки — ты вставил кейсы."),
+    packRow("🎬","План","План модулей, домашек и контрольных на неделю или модуль","Методисты","Планер пустой — не хватает идей заданий.","Пачка идей заданий и формулировок — ты отобрал под программу."),
+    packRow("📋","Оферта","Оферта курса, правила возврата, пользовательское соглашение","Авторы курсов, админ","Юридический текст откладываешь — запуск сдвигается.","Черновик документов от ИИ — проверил с юристом и опубликовал."),
+    packRow("📣","Набор","Объявления о наборе: тексты для рекламы и соцсетей","Продюсеры курсов","Креативы не цепляют — бюджет на рекламу тлеет.","Варианты заголовков и текстов объявлений за минуты."),
+    packRow("📊","Итоги","Отчёт по группе: прогресс, посещаемость, выгрузка для партнёров","Администраторы школ","Сводка из LMS и таблиц вручную — вечер в Excel.","ИИ помог структурировать данные и текст отчёта — ты проверил цифры.")
+  ],
+  finance:[
+    packRow("✏️","Письмо","Пояснительная записка, письмо клиенту или запрос в контрагента","Бухгалтеры на аутсорсе","Формулировки «не как у человека» — правишь до бесконечности.","ИИ набросал вежливый и точный текст — ты сверил с регламентом."),
+    packRow("🤝","Клиенты","Запросы документов, актов и разъяснений от клиентов","Бухгалтерия компаний","Одинаковые вопросы — отвечаешь развёрнуто каждый раз.","Черновики ответов по типовым запросам — отправил быстрее."),
+    packRow("📨","Переписка","Письма в банк, фонд и контрагентам по операциям и закрытию периода","Главбухи, финдиректора","Официальный стиль даётся тяжело — время уходит.","ИИ помог с корректными формулировками — ты приложил номера и суммы."),
+    packRow("📐","Отчёт рук-ву","Презентация или текст отчёта для руководства по итогам периода","Финансовые контролёры","Слайды и выводы не складываются — готовишь до ночи.","ИИ собрал логику и черновик выводов — ты проверил цифры."),
+    packRow("🎬","Регламент","Чек-листы и регламенты учёта под процесс или аудит","Финансовые менеджеры","Документ растёт как на дрожжах — не закончить в срок.","ИИ помог со структурой разделов — ты утвердил у команды."),
+    packRow("📋","Договор","Договор на бухобслуживание или приложение к ДС","Бухфирмы","Юридические формулировки тормозят подписание.","Черновик разделов — юрист быстро доработал."),
+    packRow("📣","КП услуг","Коммерческое предложение на бухгалтерские или финансовые услуги","Финконсалтинг","КП выглядит шаблонно — клиент не отвечает.","ИИ помог с УТП и структурой предложения — ты добавил кейсы."),
+    packRow("📊","Закрытие","Финансовый отчёт, управленка или закрытие месяца с комментариями","Главбухи, CFO","Таблицы и пояснения собираешь до поздней ночи.","ИИ помог свести текстовую часть и комментарии к цифрам — ты сверил расчёты.")
+  ],
+  ved:[
+    packRow("✏️","Контракт","Письмо или допсоглашение зарубежному контрагенту: условия, инкотермс, сроки","ВЭД-менеджеры, закупки","Юридический английский даётся тяжело — правишь до ночи, сделка стоит.","ИИ помог с каркасом письма и формулировками — ты сверил с юристом и отправил."),
+    packRow("🤝","Логист","Переписка с форвардером и таможней: запросы, статусы, спорные ситуации","Логисты ВЭД","Долго объясняешь одно и то же разным контрагентам — время и нервы уходят.","Черновики ответов и резюме ситуации — отправил быстрее и структурнее."),
+    packRow("📨","Документы","Инвойс, упаковочный лист, спецификация к поставке под требования банка и ГТД","Специалисты ВЭД","Форматы не совпадают — правки по кругу, груз простаивает.","ИИ выровнял структуру и таблицы — ты подставил цифры и реквизиты."),
+    packRow("📐","Питч","Презентация или письмо для иностранного партнёра: завод, дистрибуция, OEM","Коммерческий директор, экспорт","Слайды не складываются в доверие — сделка откладывается.","ИИ собрал логику и текст — ты добавил факты и подпись компании."),
+    packRow("🎬","Сроки","План контроля: платежи, отгрузки, сертификаты, документы к декларации","Операционный менеджер ВЭД","В голове каша из дат — риск штрафов и простоя.","ИИ помог разложить чек-лист по этапам — ты утвердил ответственных."),
+    packRow("📋","Договор","Внешнеторговый договор или приложение: санкционные оговорки, валюта, арбитраж","Юристы, ВЭД","Формулировки из шаблона не подходят — правки затягивают подписание.","Черновик разделов под вашу модель — юрист доработал за один проход."),
+    packRow("📣","КП","Коммерческое предложение на поставку или услуги для зарубежного заказчика","Экспортный отдел","КП выглядит «по-русски» — клиент молчит.","ИИ помог с структурой и аккуратным английским — ты подставил условия."),
+    packRow("📊","Отчёт","Сводка по ВЭД за период: объёмы, маржа, отклонения для руководства","Финдиректор, ВЭД-аналитик","Цифры из учёта и Excel не складываются в понятный текст до конца недели.","ИИ помог с текстом и выводами — ты проверил расчёты и метрики.")
+  ],
+  students:[
+    packRow("✏️","Работа","Реферат, доклад или план курсовой: структура, источники, введение","Студенты очной и онлайн","Смотришь в пустой документ — дедлайн горит, мысли не идут.","ИИ набросал структуру и черновик разделов — ты добавил своё и сдал в срок."),
+    packRow("🤝","Препод","Вежливое письмо преподавателю: перенос, уважительная причина, уточнение по зачёту","Студенты","Формулировки то грубые, то размытые — переписываешь десять раз.","Готовый вежливый текст — поправил пару строк и отправил."),
+    packRow("📨","Деканат","Заявление в деканат или учебный офис: академ, справка, восстановление","Студенты","Не знаешь, с чего начать официальное заявление — теряешь время в очередях.","ИИ помог с формулировками и блоками — ты подставил данные и подписал."),
+    packRow("📐","Защита","Слайды и речь к защите проекта, диплома или практики","Выпускники","Слайды разъезжаются — не укладываешься в регламент.","ИИ собрал логику слайдов и тезисы речи — ты подставил факты."),
+    packRow("🎬","Сессия","План подготовки к зачётной неделе: темы, приоритеты, шпаргалки-конспекты","Студенты","Хаос в заметках — не понимаешь, с чего начать.","ИИ помог разложить темы по дням и набросать конспекты — ты дополнил своим."),
+    packRow("📋","Практика","Отчёт по практике: дневник, характеристика, выводы для руководителя","Студенты-практиканты","Официальный стиль не даётся — отчёт переносишь на ночь.","Черновик разделов от ИИ — ты вставил реальные задачи и даты."),
+    packRow("📣","Объявление","Текст объявления: поиск группы, материалы, подработка рядом с кампусом","Студенты","Короткий текст не цепляет — откликов ноль.","Несколько вариантов формулировок — выбрал и опубликовал."),
+    packRow("📊","Портфолио","Сопроводительное к стажировке или резюме: проекты, навыки, сопроводительное письмо","Выпускники","Резюме шаблонное — HR не отвечает.","ИИ помог выделить достижения и текст письма — ты проверил факты.")
+  ],
+  pensioners:[
+    packRow("✏️","Письмо","Обращение в организацию, жск, соцзащиту: вежливо и по делу","Пенсионеры","Боишься ошибиться в формулировках — откладываешь на потом.","ИИ помог собрать корректное письмо — ты распечатал или отправил."),
+    packRow("🤝","Уведомление","Разобрать сложное уведомление или договор простым языком","Пенсионеры","Мелкий шрифт и юридические термины — голова кружится.","ИИ кратко объяснил суть и что делать дальше — ты сверился с родными."),
+    packRow("📨","Справки","Запрос справки, выписки или подтверждения в МФЦ или онлайн","Пенсионеры","Не знаешь, какие слова использовать в заявлении — стоишь в очереди второй раз.","Готовый текст заявления — вписал данные и сдал."),
+    packRow("📐","Поздравление","Тост или поздравление на юбилей, семейный праздник — тёпло и без шаблона","Семьи","Хочется сказать красиво — слова не складываются.","ИИ предложил несколько вариантов — ты выбрал и произнёс своими словами."),
+    packRow("🎬","План дел","План на неделю: врачи, оплаты, звонки, документы — чтобы ничего не забыть","Пенсионеры","Бумажки теряются — забываешь про важное.","ИИ помог составить понятный список по дням — ты дополнил личными делами."),
+    packRow("📋","Заявление","Заявление на льготы, компенсации или перерасчёт — официальный стиль","Пенсионеры","Страшно ошибиться в реквизитах и формулировках.","Черновик с нужными блоками — ты проверил паспортные данные."),
+    packRow("📣","Объявление","Объявление о продаже, услуге или поиске помощника по хозяйству","Пенсионеры","Текст короткий, но непонятный покупателям.","ИИ помог ясно описать условия и контакт."),
+    packRow("📊","Архив","Сводка документов: что где лежит, сроки, кому звонить в каком случае","Семьи","Папки смешались — найти нужное к вечеру не успеваешь.","ИИ помог оформить простую таблицу и памятку — ты распечатал и положил в дело.")
+  ],
+  home:[
+    packRow("✏️","Меню","План питания и список покупок на неделю с учётом бюджета","Домохозяйки, семьи","Сидишь над пустым листом — в магазине покупаешь лишнее.","ИИ предложил меню и список — ты скорректировал под вкусы семьи."),
+    packRow("🤝","Школа/сад","Переписка с учителем или воспитателем: вежливо и по сути","Родители","Нервно переписываешь — звучит обвиняюще или слишком мягко.","Черновик сообщения — поправил тон и отправил."),
+    packRow("📨","УК/Тсж","Обращение в управляющую компанию: жалоба, акт, запрос документов","Жильцы","Официальный текст не получается — проблему не решают.","ИИ помог оформить обращение по структуре — ты указал адрес и факты."),
+    packRow("📐","Праздник","План дня рождения или семейного события: гости, закупки, тайминг","Семьи","Всё держишь в голове — в день Х что-то забывается.","ИИ набросал чек-лист и тексты приглашений — ты подстроил под семью."),
+    packRow("🎬","Быт","Распределение дел по дому между членами семьи без конфликта","Домохозяйки","Список дел вызывает споры — никто не берёт ответственность.","ИИ помог сформулировать справедливо и мягко — согласовали быстрее."),
+    packRow("📋","Мастер","Текст объявления о поиске мастера, няни или курьера рядом с домом","Семьи","Объявление расплывчатое — звонят не те.","ИИ сформулировал условия и фильтры — меньше пустых звонков."),
+    packRow("📣","Объявление","Продажа вещей, даром отдам, местные чаты — короткий понятный текст","Домохозяйки","Фото есть, а текст не цепляет — покупателей нет.","Несколько вариантов описания — выбрал лучший."),
+    packRow("📊","Бюджет","Сводка семейных расходов за месяц и куда можно срезать без боли","Семьи","Цифры в заметках — не видно полной картины.","ИИ помог структурировать категории и комментарии — ты проверил суммы.")
+  ],
+  group_helping:[
+    packRow("✏️","Пост","Пост или анонс: приём, методика, день открытых дверей","Коучи, психологи, стилисты, врачи","Смотришь в пустой экран — пост не выходит, записи простаивают.","ИИ набросал структуру и черновик — ты добавил этику и свой голос, опубликовал вовремя."),
+    packRow("🤝","Клиенты","Переписка: перенос сессии, границы, подготовка клиента к встрече","Помогающие практики","Отвечаешь развёрнуто с нуля каждый раз — вечер ушёл на переписку.","Шаблоны и черновики ответов — поправил под человека и отправил."),
+    packRow("📨","Письма","Напоминание о записи или серия писем после консультации","Частная практика","Цепочка писем расползается — не хватает времени на приём.","ИИ помог с последовательностью и текстами — ты вычитал тон и допустимые формулировки."),
+    packRow("📐","Презентация","Презентация или план мини-воркшопа для группы или компании","Эксперты, тренеры","Слайды не держат логику — группа теряет интерес.","ИИ собрал структуру и формулировки — ты вставил упражнения и кейсы."),
+    packRow("🎬","План","Расписание приёмов и подготовка к слотам на неделю","Специалисты с календарём","Планирование тянется — захламляешь голые заметки.","ИИ помог разложить блоки времени и чек-листы подготовки."),
+    packRow("📋","Документы","Договор на услуги, оферта сайта, политика конфиденциальности","Частные практики","Юридический текст тормозит запуск.","Черновик разделов от ИИ — сверился с юристом и опубликовал."),
+    packRow("📣","Профиль","Тексты профилей и объявлений на площадках поиска специалистов","Коучи, стилисты","Описание «не цепляет» — заявок мало.","Несколько вариантов УТП и текстов — выбрал и обновил анкеты."),
+    packRow("📊","Отчёт","Отчёт для куратора, надзора или сводка по групповой программе","Психологи, методисты","Формулировки официального стиля даются тяжело — дедлайн горит.","ИИ помог со структурой и черновиком — ты проверил факты и подписал.")
+  ],
+  group_law:[
+    packRow("✏️","Письмо","Письмо клиенту или в госорган: запрос, пояснение, сопроводительное","Бухгалтеры, юристы, риелторы","Каждое письмо с нуля — очередь документов не убывает.","ИИ набросал вежливый точный текст — ты подставил реквизиты и отправил."),
+    packRow("🤝","Сделка","Сводка документов и переписка по срокам сделки или отчётности","Риелторы, юристы","Контекст теряется между чатами — ошибки дорого стоят.","Черновики сообщений и резюме переписки — отправил быстрее и яснее."),
+    packRow("📨","Запросы","Ответы клиентам на типовые вопросы по документам и суммам","Бухгалтерия, финансы","Один и тот же вопрос — длинный ответ каждый раз.","Готовые черновики по типовым кейсам — дополнил цифрами."),
+    packRow("📐","Презентация","Презентация объекта, услуги или отчёта для клиента или руководства","Риелторы, финдиректора","Слайды разъезжаются — не успеваешь к встрече.","ИИ собрал логику слайдов — ты добавил фото, цифры, выводы."),
+    packRow("🎬","Чек-лист","Чек-лист проверки сделки, закрытия месяца или аудита","Бухгалтеры","Пункты размножаются — не закрыть в срок.","ИИ помог структурировать этапы — ты утвердил у себя или у команды."),
+    packRow("📋","Договор","Договор аренды, купли-продажи, оказания услуг или приложение","Юристы, риелторы","Формулировки из шаблона не подходят — правки по ночам.","Черновик разделов под ваш кейс — юрист доработал быстрее."),
+    packRow("📣","КП","Коммерческое предложение на бухуслуги, юрсопровождение или подбор объекта","Эксперты B2B","КП шаблонное — клиент не отвечает.","ИИ помог с УТП и структурой — ты добавил кейсы и цены."),
+    packRow("📊","Записка","Аналитическая записка или заключение по материалам дела или отчёта","Юристы, аналитики","Текст не складывается — день уходит на черновик.","ИИ помог с логикой и абзацами — ты сверил с нормами и фактами.")
+  ],
+  group_digital:[
+    packRow("✏️","Контент","Пост, тред или карусель под продукт, личный бренд или работодателя","Маркетологи, дизайнеры, IT","Черновик буксует — контент-план срывается.","ИИ дал структуру и варианты — ты вставил tone of voice и факты."),
+    packRow("🤝","Переписка","Ответы в рабочих чатах: согласования, статусы, пояснения для смежников","Digital-команды","Пишешь одно и то же разными словами — спринт стоит.","Короткие черновики от ИИ — отправил и вернулся к задачам."),
+    packRow("📨","Рассылка","Цепочка писем или уведомлений в продукте под сегмент пользователей","Продакт, маркетинг","Триггеры и тексты откладываешь — релиз без коммуникаций.","ИИ собрал последовательность и черновики — ты проверил логику."),
+    packRow("📐","Слайды","Презентация для клиента, демо или внутренней встречи","Дизайнеры, PM, разработка","Слайды не держат мысль — встреча переносится.","ИИ набросал структуру и формулировки — ты добавил макеты и данные."),
+    packRow("🎬","Бэклог","Декомпозиция задач и описания для команды или тикетов","IT, проджекты","Формулировки корявые — уточнения съедают день.","ИИ помог описать задачи и критерии — ты выставил приоритеты."),
+    packRow("📋","ТЗ","ТЗ, бриф на дизайн или комментарии к макету и коду","Дизайнеры, разработка","Смысл теряется в переписке — правки бесконечны.","ИИ структурировал запрос — меньше раундов согласований."),
+    packRow("📣","Креативы","Заголовки и тексты объявлений, лендинга или стора приложения","Маркетинг, growth","Запуск теста задерживается из-за формулировок.","Пачка вариантов за минуты — включил эксперимент."),
+    packRow("📊","Отчёт","Отчёт по кампании, метрикам продукта или спринту для стейкхолдеров","Маркетологи, IT-лиды","Данные есть, а выводов нет — таблица к полуночи.","ИИ помог со сводкой и текстом выводов — ты проверил цифры.")
+  ],
+  group_service:[
+    packRow("✏️","Меню/акции","Тексты для меню, акций и сторис: салон, кафе, студия","Сервис B2C","Формулировки блеклые — гость не цепляется.","ИИ предложил формулировки и акценты — ты поправил под стиль заведения."),
+    packRow("🤝","Гости","Ответы гостям и клиентам: бронь, жалобы, особые запросы","Кафе, салоны, клиники","Каждый ответ с нуля — очередь в чате растёт.","Шаблоны и черновики — отправил быстрее, тон заведения сохранён."),
+    packRow("📨","Рассылка","Напоминания о записи, акции, возврат клиентов","Фитнес, клиники, салоны","Цепочка писем не собрана — выручка уплывает.","ИИ помог с текстами и таймингом — ты настроил в CRM."),
+    packRow("📐","Стандарты","Памятка для персонала или чек-лист зала, кухни, зала процедур","Управляющие, админы","Документ раздувается — сотрудники не читают.","ИИ сжал до понятных пунктов — ты утвердил у команды."),
+    packRow("🎬","Смена","План смены: задачи, подмены, закупки на день","Кафе, салоны","На словах всё ясно — по факту забывается половина.","ИИ помог разложить список по ролям и времени."),
+    packRow("📋","Договор","Оферта клуба, договор на абонемент или оказание услуг","Фитнес, клиники","Юридический текст тормозит продажи.","Черновик разделов — юрист поправил точечно."),
+    packRow("📣","Реклама","Объявления и профили на картах и агрегаторах записи","Клиники, студии","Мало откликов — текст не про выгоду гостя.","Несколько вариантов описания и заголовков — запустил лучший."),
+    packRow("📊","Отчёт","Сводка за день/неделю: загрузка залов, жалобы, выручка для руководства","Руководители точек","Цифры в разных таблицах — отчёт к ночи.","ИИ помог собрать текст и выводы — ты проверил факты.")
+  ],
+  group_goods:[
+    packRow("✏️","Карточка","Описание товара для маркетплейса, сайта или витрины","Торговля, handmade","Текст «как у всех» — конверсия низкая.","ИИ предложил УТП и структуру карточки — ты проверил характеристики."),
+    packRow("🤝","Клиенты","Ответы покупателям: доставка, возврат, комплектация","Магазины, производители","Одни и те же вопросы — переписка съедает день.","Черновики ответов по типовым кейсам — отправил быстрее."),
+    packRow("📨","Поставщик","Переписка с поставщиком: сроки, партия, документы","Закупки, стройка","Письма длинные и размытые — сроки сдвигаются.","ИИ помог чётко сформулировать запрос и последствия."),
+    packRow("📐","Коммерция","Коммерческое предложение оптовику или подрядчику","Торговля, строительство","КП раздувается — клиент не дочитывает.","ИИ собрал структуру и акценты — ты подставил цифры."),
+    packRow("🎬","Склад/объект","План отгрузки, приёмки или этапов работ на объекте","Склад, прораб","Задачи в голове — конфликты по срокам.","ИИ помог разложить этапы и ответственных."),
+    packRow("📋","Спецификация","Спецификация, смета или приложение к договору поставки","Производство, стройка","Таблица и текст не бьются — правки по кругу.","ИИ выровнял формулировки и таблицу — ты сверил количества."),
+    packRow("📣","Объявление","Объявление о поиске дилера, партнёра или подрядчика","Малый бизнес","Отклики не те — задача описана расплывчато.","ИИ сформулировал условия и фильтры."),
+    packRow("📊","Отчёт","Отчёт по продажам, марже или ходу работ для учредителя","Директор магазина, прораб","Вечер уходит на сводку из разных источников.","ИИ помог с текстом выводов — ты проверил цифры.")
+  ],
+  group_projects:[
+    packRow("✏️","Анонс","Анонс потока, вебинара или запуска продукта агентства","Онлайн-школы, агентства","Текст не цепляет — переносишь старт.","ИИ предложил углы и черновик — ты добавил факты и тон бренда."),
+    packRow("🤝","Клиент","Письмо или слайды для клиента агентства: статус, правки, результаты","Агентства, продакшн","Каждый раз объясняешь заново — час на письмо.","Черновик структуры и формулировок — клиент понял быстрее."),
+    packRow("📨","Воронка","Цепочка касаний для школы или лида под услугу агентства","Маркетинг образования","Автоматизация без текстов — лиды остывают.","ИИ набросал последовательность и тексты — ты включил в CRM."),
+    packRow("📐","Питч","Презентация для тендера, партнёра или зарубежного контрагента (ВЭД)","Проектные офисы, ВЭД","Слайды не держат линию доверия — сделка висит.","ИИ собрал логику и текст — ты добавил кейсы и реквизиты."),
+    packRow("🎬","План","План недели: уроки, релизы, отгрузки, дедлайны по проектам","Методисты, PM","Всё в заметках — дедлайн подкрадывается незаметно.","ИИ помог разложить календарь и приоритеты."),
+    packRow("📋","Договор","Договор с подрядчиком, лицензия, приложение к ВЭД-сделке","Агентства, импортёры","Юридические блоки тормозят подписание.","Черновик разделов от ИИ — юрист прошёлся точечно."),
+    packRow("📣","Набор","Тексты объявлений о наборе на курс или в команду проекта","Школы, студии","Креативы слабые — стоимость лида растёт.","Несколько вариантов заголовков и текстов — запустил тест."),
+    packRow("📊","Отчёт","Отчёт для руководства или клиента: метрики, выводы, риски","Агентства, ВЭД-отдел","Данные собрал — выводов нет к концу дня.","ИИ помог оформить выводы и рекомендации — ты проверил цифры.")
+  ],
+  group_home:[
+    packRow("✏️","Меню","План питания и закупок на неделю с учётом бюджета и аллергий","Мамы, семьи","Список не собирается — в магазине тратишь лишнее.","ИИ предложил меню и список — ты подстроил под семью."),
+    packRow("🤝","Школа","Переписка с учителем или классным: вопросы, события, оценки","Родители","Пишешь и стираешь — звучит не так, как хочешь.","Черновик вежливого сообщения — отправил уверенно."),
+    packRow("📨","Врачи","Запись к врачу, запрос справки или расшифровка назначений","Семьи","Официальные формулировки даются тяжело — откладываешь звонок.","ИИ помог с текстом запроса — ты назвал даты и данные."),
+    packRow("📐","Праздник","План дня рождения ребёнка или семейного праздника","Мамы","Держишь всё в голове — в день Х что-то забывается.","ИИ набросал чек-лист и тексты приглашений — ты подстроил под дом."),
+    packRow("🎬","Режим дня","Распределение дел и «кто за что» без споров","Семьи","Списки вызывают напряжение — никто не берёт задачи.","ИИ сформулировал справедливо и мягко — договорились быстрее."),
+    packRow("📋","Документы","Заявление в сад, школу, секцию или на льготы","Родители","Не знаешь, с чего начать официальный текст.","ИИ помог с блоками заявления — ты проверил данные."),
+    packRow("📣","Объявление","Продажа детских вещей, поиск няни или кружка рядом с домом","Мамы, чаты двора","Текст короткий и неясный — откликов нет.","Несколько вариантов — выбрал и опубликовал."),
+    packRow("📊","Бюджет","Сводка семейных трат и куда срезать без «войны» за деньги","Семьи","Заметки разрозненные — картины нет.","ИИ помог категориям и комментариям — ты сверил суммы.")
+  ]
+};
+var TASK_PACKS={};
+Object.keys(THEMES).forEach(function(k){TASK_PACKS[k]=mergeLevels(THEMES[k]);});
+var LVL=TASK_PACKS.general;
+var NN,nodes;
+function rebuildRoad(){
+  NN=LVL.length+1;
+  nodes=[];
+  for(var i=0;i<NN;i++){
+    var t=i/(NN-1);
+    nodes.push({x:20+t*560,y:34+Math.sin(t*Math.PI*2)*16});
+  }
+}
+rebuildRoad();
+
+const AINA_AVATAR_HTML =
+  '<div class="mava mava--aina" title="Айна">' +
+  '<img src="assets/aina-mascot.png" alt="Айна — ИИ-наставник" width="58" height="84" loading="lazy" decoding="async" />' +
+  '</div>';
 
 const SKIES=[
   {label:"Утро · 7:00",top:"#5BA3D9",mid:"#87CEEB",bot:"#C5E8FF",sun:0.05,stars:false},
@@ -214,7 +559,7 @@ const SKIES=[
 
 function drawSky(step){
   const cv=document.getElementById('sky-cv');if(!cv)return;
-  const cx=cv.getContext('2d'),sw=640,sh=130;
+  const cx=cv.getContext('2d'),sw=640,sh=84;
   const s=SKIES[Math.min(step,SKIES.length-1)];
   const g=cx.createLinearGradient(0,0,0,sh);
   g.addColorStop(0,s.top);g.addColorStop(0.55,s.mid);g.addColorStop(1,s.bot);
@@ -242,12 +587,6 @@ function drawSky(step){
   var tb=document.getElementById('time-badge');if(tb)tb.textContent=s.label;
 }
 
-var NN=LVL.length+1;
-var nodes=[];
-for(var i=0;i<NN;i++){
-  var t=i/(NN-1);
-  nodes.push({x:20+t*560,y:34+Math.sin(t*Math.PI*2)*16});
-}
 function buildP(){
   var d='M'+nodes[0].x+','+nodes[0].y;
   for(var i=1;i<nodes.length;i++){
@@ -264,6 +603,7 @@ var heroWalking=false,heroAnim=0;
 function fmt(n){return Math.round(n).toLocaleString('ru-RU');}
 
 function setRate(v){
+  SFX.preset();
   document.getElementById('hour-val').value=v;
   document.getElementById('month-num').textContent=fmt(v*8*22);
   document.querySelectorAll('.preset').forEach(function(b){
@@ -293,8 +633,9 @@ function renderNodes(active){
     c.setAttribute('stroke-width','1.5');g.appendChild(c);
     if(i<LVL.length){
       var t=document.createElementNS('http://www.w3.org/2000/svg','text');
-      t.setAttribute('x',n.x);t.setAttribute('y',n.y+3.5);t.setAttribute('text-anchor','middle');t.setAttribute('font-size','7.5');
-      t.setAttribute('fill',done?'#fff':act?'#fff':'rgba(220,200,100,0.6)');t.textContent=LVL[i].label;g.appendChild(t);
+      t.setAttribute('x',n.x);t.setAttribute('y',n.y+3.5);t.setAttribute('text-anchor','middle');      t.setAttribute('font-size','9');
+      t.setAttribute('font-weight','600');
+      t.setAttribute('fill',done?'#fff':act?'#fff':'rgba(220,200,100,0.75)');t.textContent=LVL[i].label;g.appendChild(t);
     } else {
       var t2=document.createElementNS('http://www.w3.org/2000/svg','text');
       t2.setAttribute('x',n.x);t2.setAttribute('y',n.y+4.5);t2.setAttribute('text-anchor','middle');t2.setAttribute('font-size','11');
@@ -310,29 +651,52 @@ function renderHero(){
   var ls=heroWalking?Math.sin(heroAnim*0.28)*9:0;
   var as=heroWalking?Math.sin(heroAnim*0.28)*7:0;
   var ns=document.createElementNS.bind(document,'http://www.w3.org/2000/svg');
+  var hair='#3d2d22',hairHi='#5c4334',skin='#e8c4a8',skinSh='#d4a574',shirt='#4a43a8',pants='#36495a';
   function ln(x1,y1,x2,y2,s,w){
     var l=ns('line');l.setAttribute('x1',x1);l.setAttribute('y1',y1);
     l.setAttribute('x2',x2);l.setAttribute('y2',y2);
     l.setAttribute('stroke',s);l.setAttribute('stroke-width',w);
     l.setAttribute('stroke-linecap','round');g.appendChild(l);
   }
-  ln(hx-4,hy+bob+5,hx-4+ls,hy+bob+16,'#3C3489',2.5);
-  ln(hx+4,hy+bob+5,hx+4-ls,hy+bob+16,'#3C3489',2.5);
-  ln(hx-8,hy+bob-3,hx-13-as,hy+bob+5,'#534AB7',2);
-  ln(hx+8,hy+bob-3,hx+13+as,hy+bob+5,'#534AB7',2);
-  var body=ns('ellipse');body.setAttribute('cx',hx);body.setAttribute('cy',hy+bob);
-  body.setAttribute('rx','8');body.setAttribute('ry','9');body.setAttribute('fill','#534AB7');g.appendChild(body);
-  var glow=ns('circle');glow.setAttribute('cx',hx);glow.setAttribute('cy',hy+bob-13);
-  glow.setAttribute('r','13');glow.setAttribute('fill','rgba(127,119,221,0.18)');g.appendChild(glow);
-  var head=ns('circle');head.setAttribute('cx',hx);head.setAttribute('cy',hy+bob-13);
-  head.setAttribute('r','9');head.setAttribute('fill','#FAEEDA');g.appendChild(head);
-  var e1=ns('circle');e1.setAttribute('cx',hx-3);e1.setAttribute('cy',hy+bob-14);
-  e1.setAttribute('r','1.8');e1.setAttribute('fill','#333');g.appendChild(e1);
-  var e2=ns('circle');e2.setAttribute('cx',hx+3);e2.setAttribute('cy',hy+bob-14);
-  e2.setAttribute('r','1.8');e2.setAttribute('fill','#333');g.appendChild(e2);
-  var sm=ns('path');
-  sm.setAttribute('d','M'+(hx-3)+','+(hy+bob-9)+' Q'+hx+','+(hy+bob-6.5)+' '+(hx+3)+','+(hy+bob-9));
-  sm.setAttribute('stroke','#555');sm.setAttribute('stroke-width','1.2');sm.setAttribute('fill','none');g.appendChild(sm);
+  function el(tag,attrs){
+    var e=ns(tag);
+    for(var k in attrs){
+      var an=k.indexOf('_')>=0?k.replace(/_/g,'-'):k.replace(/([A-Z])/g,function(m){return '-'+m.toLowerCase();});
+      e.setAttribute(an,attrs[k]);
+    }
+    g.appendChild(e);return e;
+  }
+  var hcY=hy+bob-14;
+  var legL=hx-5+ls*0.35,legR=hx+5-ls*0.35;
+  el('path',{d:'M'+(hx-5)+','+(hy+bob+5)+' L'+(legL-1)+','+(hy+bob+22)+' L'+(legL+3)+','+(hy+bob+22)+' L'+(hx-3)+','+(hy+bob+7)+' Z',fill:pants});
+  el('path',{d:'M'+(hx+5)+','+(hy+bob+5)+' L'+(legR+1)+','+(hy+bob+22)+' L'+(legR-3)+','+(hy+bob+22)+' L'+(hx+3)+','+(hy+bob+7)+' Z',fill:pants});
+  el('ellipse',{cx:legL+1,cy:hy+bob+22.5,rx:4,ry:2.1,fill:'#1e1e1e'});
+  el('ellipse',{cx:legR-1,cy:hy+bob+22.5,rx:4,ry:2.1,fill:'#1e1e1e'});
+  el('rect',{x:hx-9.5,y:hy+bob-5,width:19,height:15,rx:5,fill:shirt});
+  el('path',{d:'M'+(hx-10)+','+(hy+bob-5)+' Q'+hx+','+(hy+bob-9)+' '+(hx+10)+','+(hy+bob-5)+' L'+(hx+9)+','+(hy+bob+8)+' L'+(hx-9)+','+(hy+bob+8)+' Z',fill:shirt});
+  ln(hx-10,hy+bob-2,hx-15-as*0.9,hy+bob+4,skin,3.4);
+  ln(hx+10,hy+bob-2,hx+15+as*0.9,hy+bob+4,skin,3.4);
+  el('circle',{cx:hx-15.5-as*0.9,cy:hy+bob+5,r:2.6,fill:skin});
+  el('circle',{cx:hx+15.5+as*0.9,cy:hy+bob+5,r:2.6,fill:skin});
+  el('rect',{x:hx-2.8,y:hcY+9,width:5.6,height:5.5,rx:2.2,fill:skin});
+  el('ellipse',{cx:hx,cy:hcY-2,rx:12,ry:13,fill:hair});
+  el('ellipse',{cx:hx-11,cy:hcY-3,rx:5,ry:8,fill:hair,transform:'rotate(-18 '+hx+' '+hcY+')'});
+  el('ellipse',{cx:hx+11,cy:hcY-3,rx:5,ry:8,fill:hair,transform:'rotate(18 '+hx+' '+hcY+')'});
+  el('ellipse',{cx:hx,cy:hcY,rx:10.2,ry:11,fill:skin});
+  el('ellipse',{cx:hx-10.5,cy:hcY+0.8,rx:2.2,ry:3.2,fill:skinSh,opacity:'0.45'});
+  el('ellipse',{cx:hx+10.5,cy:hcY+0.8,rx:2.2,ry:3.2,fill:skinSh,opacity:'0.45'});
+  el('ellipse',{cx:hx-4,cy:hcY-1.8,rx:3,ry:3.4,fill:'#fff'});
+  el('ellipse',{cx:hx+4,cy:hcY-1.8,rx:3,ry:3.4,fill:'#fff'});
+  el('circle',{cx:hx-3.6,cy:hcY-1.5,r:1.65,fill:'#1a1612'});
+  el('circle',{cx:hx+3.6,cy:hcY-1.5,r:1.65,fill:'#1a1612'});
+  el('circle',{cx:hx-3.2,cy:hcY-2.1,r:0.5,fill:'#fff',opacity:'0.9'});
+  el('circle',{cx:hx+4,cy:hcY-2.1,r:0.5,fill:'#fff',opacity:'0.9'});
+  el('path',{d:'M'+(hx-7)+','+(hcY-6)+' Q'+(hx-3.5)+','+(hcY-7.5)+' '+(hx-1)+','+(hcY-6.2),stroke:hairHi,stroke_width:'1.6',fill:'none',stroke_linecap:'round'});
+  el('path',{d:'M'+(hx+7)+','+(hcY-6)+' Q'+(hx+3.5)+','+(hcY-7.5)+' '+(hx+1)+','+(hcY-6.2),stroke:hairHi,stroke_width:'1.6',fill:'none',stroke_linecap:'round'});
+  el('path',{d:'M'+hx+','+(hcY+3)+' L'+(hx+1.1)+','+(hcY+5.8)+' L'+(hx-1.1)+','+(hcY+5.8)+' Z',fill:skinSh,opacity:'0.5'});
+  el('path',{d:'M'+(hx-4)+','+(hcY+6)+' Q'+hx+','+(hcY+8.8)+' '+(hx+4)+','+(hcY+6),stroke:'#9a5c4a',stroke_width:'1.35',fill:'none',stroke_linecap:'round'});
+  el('path',{d:'M'+(hx-10)+','+(hcY-8)+' Q'+(hx-5)+','+(hcY-14)+' '+hx+','+(hcY-11)+' Q'+(hx+5)+','+(hcY-14)+' '+(hx+10)+','+(hcY-8)+' Q'+(hx+7)+','+(hcY-5)+' '+hx+','+(hcY-7)+' Q'+(hx-7)+','+(hcY-5)+' '+(hx-10)+','+(hcY-8)+' Z',fill:hairHi});
+  el('path',{d:'M'+(hx-10)+','+(hcY-7)+' Q'+(hx-4)+','+(hcY-12)+' '+hx+','+(hcY-10)+' Q'+(hx+5)+','+(hcY-12)+' '+(hx+10)+','+(hcY-7)+' Q'+hx+','+(hcY-9)+' '+(hx-10)+','+(hcY-7)+' Z',fill:hair});
 }
 
 function walkTo(target,cb){
@@ -344,6 +708,7 @@ function walkTo(target,cb){
     var e=prog<.5?2*prog*prog:1-Math.pow(-2*prog+2,2)/2;
     heroPos.x=start.x+(end.x-start.x)*e;
     heroPos.y=start.y+(end.y-start.y)*e;
+    if(heroWalking&&heroAnim%22===0){SFX.footstep();}
     renderHero();
     if(prog<1){requestAnimationFrame(step);}
     else{heroWalking=false;heroPos={x:end.x,y:end.y};renderHero();if(cb)cb();}
@@ -374,29 +739,34 @@ function showLevel(){
     renderNodes(G.step);
     var mo=Math.round(lv.mult*G.rate);
     var MC={
-      time:{bg:'#2a0a0a',bc:'rgba(226,75,74,0.4)',tc:'#f09595'},
-      money:{bg:'#2a1500',bc:'rgba(186,117,23,0.4)',tc:'#FAC775'},
-      energy:{bg:'#1a1535',bc:'rgba(127,119,221,0.4)',tc:'#AFA9EC'},
-      stress:{bg:'#2a0a1a',bc:'rgba(212,83,126,0.4)',tc:'#ED93B1'}
+      time:{p1b:'#FFF6E8',p1t:'#6a4510',p2b:'#FDEBEB',p2t:'#8e2323'},
+      money:{p1b:'#FFF8ED',p1t:'#7a5210',p2b:'#FFF3E0',p2t:'#8a5010'},
+      energy:{p1b:'#EDEAFB',p1t:'#3d2f8a',p2b:'#FDEBEB',p2t:'#8e2323'},
+      stress:{p1b:'#FFE8F3',p1t:'#7a3058',p2b:'#FDEBEB',p2t:'#8e2323'}
     };
     var mc=MC[lv.mt]||MC.time;
     document.getElementById('level-area').innerHTML=
       '<div class="scene">'+
-        '<div class="sc-top">'+
-          '<div class="sc-icon">'+lv.icon+'</div>'+
-          '<div class="sc-meta">'+
-            '<div class="sc-step">Задача '+(G.step+1)+' из '+LVL.length+' · '+lv.who+'</div>'+
-            '<div class="sc-title">'+lv.task+'</div>'+
+        '<div class="task-focus">'+
+          '<span class="task-pill">Задача '+(G.step+1)+' из '+LVL.length+'</span>'+
+          '<div class="sc-top">'+
+            '<div class="sc-icon">'+lv.icon+'</div>'+
+            '<div class="sc-meta">'+
+              '<div class="sc-step">Что нужно сделать</div>'+
+              '<div class="sc-title">'+lv.task+'</div>'+
+              '<div class="sc-who">'+lv.who+'</div>'+
+            '</div>'+
           '</div>'+
         '</div>'+
-        '<div class="mbar" style="background:'+mc.bg+';border-color:'+mc.bc+'">'+
+        '<div class="mbar-hint">Если делать вручную · «'+lv.mn+'»</div>'+
+        '<div class="mbar mbar--risk">'+
           '<div class="mface">'+lv.mf+'</div>'+
           '<div style="flex:1">'+
-            '<div class="mn" style="color:'+mc.tc+'">'+lv.mn+' появился!</div>'+
-            '<div class="md" style="color:'+mc.tc+'">'+lv.md+'</div>'+
+            '<div class="mn">'+lv.mn+'</div>'+
+            '<div class="md">'+lv.md+'</div>'+
             '<div class="mtags">'+
-              '<span class="mtag" style="background:rgba(65,36,2,0.8);color:#FAC775">−'+lv.tc+' ч</span>'+
-              '<span class="mtag" style="background:rgba(80,19,19,0.8);color:#F09595">−'+fmt(mo)+' ₽ именно твоих</span>'+
+              '<span class="mtag" style="background:'+mc.p1b+';color:'+mc.p1t+'">−'+lv.tc+' ч</span>'+
+              '<span class="mtag" style="background:'+mc.p2b+';color:'+mc.p2t+'">−'+fmt(mo)+' ₽ твоих</span>'+
             '</div>'+
           '</div>'+
         '</div>'+
@@ -407,6 +777,7 @@ function showLevel(){
         '<div class="result" id="res"></div>'+
         '<button class="next-btn" id="next-btn" onclick="goNext()">Следующая задача →</button>'+
       '</div>';
+    SFX.taskShow();
   });
 }
 
@@ -415,10 +786,12 @@ function choose(isAI,mo){
   var lv=LVL[G.step];
   var res=document.getElementById('res');res.style.display='block';
   if(isAI){
+    SFX.success();
     res.className='result good';
     res.textContent='✓ '+lv.good+' Сэкономлено: '+fmt(mo)+' ₽ и '+lv.tc+' ч твоего времени!';
     G.sv+=mo;G.tm=Math.max(0,G.tm-lv.tc*0.1);G.en=Math.max(0,G.en-2);
   } else {
+    SFX.fail();
     G.bad++;res.className='result bad';
     res.textContent='✗ '+lv.bad+' Потери: −'+fmt(mo)+' ₽ и −'+lv.tc+' ч твоей жизни.';
     G.tm=Math.max(0,G.tm-lv.tc);G.mo+=mo;G.en=Math.max(0,G.en-lv.en);G.st=Math.min(100,G.st+lv.st);
@@ -427,7 +800,7 @@ function choose(isAI,mo){
   document.getElementById('next-btn').style.display='block';
 }
 
-function goNext(){G.step++;showLevel();}
+function goNext(){SFX.next();G.step++;showLevel();}
 
 function showFinal(){
   drawSky(SKIES.length-1);
@@ -438,15 +811,15 @@ function showFinal(){
   if(G.bad===0){
     title='Идеальный день — ты ИИ-мастер!';
     sub='Монстры не получили ни кусочка. Максимальная экономия!';
-    mentor='Ты уже думаешь как ИИ-специалист. Теперь выстроим системный стек под все задачи твоего бизнеса!';
+    mentor='Ты уже на уровне ИИ-специалиста — давай закрепим это в системе. Напиши мне в чат: соберём стек под твой бизнес без лишней суеты.';
   } else if(G.bad<=3){
     title='Неплохо, но монстры кусались!';
     sub=G.bad+' задачи достались монстрам. Посмотри на разницу.';
-    mentor='Хаотичный подход даёт 20% результата. Системный — все 80%. Одна консультация изменит подход навсегда!';
+    mentor='Хватит кормить хаосом 80% результата. Одно сообщение Айне — и я покажу, как перейти в системный режим и не откатываться назад.';
   } else {
     title='Монстры устроили пир!';
     sub='Так выглядит обычный день без нейросетей. Каждый день, год за годом.';
-    mentor='Люди работают в 3 раза больше просто потому что не знают с чего начать. Одна встреча — и завтра уже иначе!';
+    mentor='Годами крутятся в «с чего начать», хотя достаточно одного диалога. Напиши мне — разложим по полочкам, и завтра пойдёшь уже другой дорогой.';
   }
   fin.innerHTML=
     '<div class="f-title">'+title+'</div>'+
@@ -457,10 +830,10 @@ function showFinal(){
       '<div class="scard"><div class="scard-l">Сэкономлено за день</div><div class="scard-v grn">'+fmt(G.sv)+' ₽</div><div class="scard-n">благодаря нейросетям</div></div>'+
       '<div class="scard"><div class="scard-l">Экономия за год</div><div class="scard-v grn">'+fmt(sY)+' ₽</div><div class="scard-n">если внедрить сейчас</div></div>'+
     '</div>'+
-    '<div class="mrow"><div class="mava">✦</div><div><div class="mname">Айна — ИИ-наставник</div><div class="mtext">'+mentor+'</div></div></div>'+
+    '<div class="mrow mrow--mentor">'+AINA_AVATAR_HTML+'<div class="mrow-mentor__body"><div class="mname">Айна — напиши, я на связи</div><div class="mtext">'+mentor+'</div></div></div>'+
     '<div class="cta-wrap">'+
-      '<div class="cta-title">Записаться к Айне на консультацию</div>'+
-      '<div class="cta-sub">Разберём твои задачи и внедрим нейросети в работу — быстро и без лишней техники</div>'+
+      '<div class="cta-title">Напиши Айне сейчас — не откладывай на «потом»</div>'+
+      '<div class="cta-sub">Личный разбор без шаблонов: куда внедрить нейросети у тебя и с чего начать уже сегодня</div>'+
       '<div class="cta-btns">'+
         '<button class="ctabtn tg" onclick="window.open(\'https://t.me/aina_gard\',\'_blank\')">✈ Telegram</button>'+
         '<button class="ctabtn wa" onclick="window.open(\'https://wa.me/79025288988\',\'_blank\')">💬 WhatsApp</button>'+
@@ -468,14 +841,35 @@ function showFinal(){
       '</div>'+
     '</div>'+
     '<button class="rbtn" onclick="restartGame()">↺ Сыграть ещё раз</button>';
+  var vic=G.bad===0?2:G.bad<=3?1:0;
+  SFX.victory(vic);
+}
+
+function updateGoBtn(){
+  var sel=document.getElementById('activity-group');
+  var btn=document.getElementById('go-btn');
+  if(!btn)return;
+  btn.disabled=!sel||!sel.value||sel.value.length===0;
 }
 
 function startGame(){
+  var ag=document.getElementById('activity-group');
+  var gid=ag&&ag.value||'';
+  if(!gid||!TASK_PACKS[gid]){
+    updateGoBtn();
+    return;
+  }
+  SFX.resume();
+  SFX.gameStart();
   var v=Math.max(50,parseInt(document.getElementById('hour-val').value)||500);
+  LVL=TASK_PACKS[gid];
+  rebuildRoad();
+  try{localStorage.setItem('aina_activity_group',gid);}catch(e){}
   G={step:0,en:100,tm:8,mo:0,sv:0,st:0,bad:0,rate:v};
   heroPos={x:nodes[0].x,y:nodes[0].y};
+  document.body.classList.add('game-play');
   document.getElementById('intro-screen').style.display='none';
-  document.getElementById('game-screen').style.display='block';
+  document.getElementById('game-screen').style.display='flex';
   document.getElementById('final-box').style.display='none';
   var PD=buildP();
   document.getElementById('rp1').setAttribute('d',PD);
@@ -484,6 +878,8 @@ function startGame(){
 }
 
 function restartGame(){
+  SFX.ui();
+  document.body.classList.remove('game-play');
   document.getElementById('final-box').style.display='none';
   document.getElementById('game-screen').style.display='none';
   document.getElementById('intro-screen').style.display='block';
@@ -492,6 +888,43 @@ function restartGame(){
   G={step:0,en:100,tm:8,mo:0,sv:0,st:0,bad:0,rate:500};
   heroPos={x:nodes[0].x,y:nodes[0].y};
 }
+
+(function(){
+  try{
+    var sp=localStorage.getItem('aina_activity_group');
+    var sel=document.getElementById('activity-group');
+    if(sp&&sel&&TASK_PACKS[sp])sel.value=sp;
+    updateGoBtn();
+    if(sel)sel.addEventListener('change',function(){
+      try{
+        if(sel.value)localStorage.setItem('aina_activity_group',sel.value);
+        else localStorage.removeItem('aina_activity_group');
+      }catch(e){}
+      updateGoBtn();
+      SFX.preset();
+    });
+  }catch(e){}
+})();
+SFX.init();
+(function(){
+  var btn=document.getElementById('sfx-toggle');
+  if(!btn)return;
+  function sync(){
+    btn.textContent=SFX.isMuted()?'🔇':'🔊';
+    btn.setAttribute('aria-pressed',SFX.isMuted()?'true':'false');
+    btn.title=SFX.isMuted()?'Включить звук':'Выключить звук';
+  }
+  sync();
+  btn.addEventListener('click',function(){
+    var m=SFX.toggle();
+    sync();
+    if(!m){SFX.resume();SFX.ui();}
+  });
+})();
+document.addEventListener('click',function(ev){
+  var el=ev.target&&ev.target.closest&&ev.target.closest('.ctabtn');
+  if(el){SFX.resume();if(!SFX.isMuted())SFX.ui();}
+},true);
 </script>
 </body>
 </html>
